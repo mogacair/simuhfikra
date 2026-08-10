@@ -6,12 +6,11 @@
  * 2. Hash Router SPA (Single Page Application - Mencegah aplikasi tertutup saat Back di HP)
  * 3. Render Menu & Tabel Siswa
  * 4. Modal Read-Only Detail Siswa
- * 5. Fitur Cetak PDF Rapi (Termasuk seluruh rincian NIK, Ibu, Alamat)
+ * 5. Fitur Cetak PDF Mobile Friendly (Langsung tanpa Pop-up Blocker)
  */
 
 /* ==========================================
    1. DATA DUMMY SISWA
-   (Nanti akan di-fetch dari Google Sheets via GAS API)
    ========================================== */
 const dummySiswa = [
     { id: 1, nisn: "0051234567", nis: "212201", nama: "Ahmad Fikri", kelas: "X-A", nik: "3201234567890001", ibu: "Siti Rahma", alamat: "Jl. Merdeka No. 12, Jakarta" },
@@ -236,22 +235,22 @@ function closeStudentModal() {
 }
 
 /* ==========================================
-   5. FITUR: CETAK PDF RAPI LENGKAP
+   5. FITUR: CETAK PDF MOBILE FRIENDLY
    ========================================== */
 
 /**
- * Mencetak Laporan PDF Rapi berdasarkan Filter aktif,
- * lengkap dengan Rincian Data (NIK, Nama Ibu, Alamat).
+ * Mencetak Laporan PDF Rapi langsung melalui browser HP/Desktop
+ * tanpa terhalang Pop-up Blocker.
  */
 function cetakPDF() {
     const filterSelect = document.getElementById('filter-kelas');
     const filterValue = filterSelect ? filterSelect.value : 'semua';
     const judulFilter = filterValue === 'semua' ? 'SELURUH KELAS' : `KELAS ${filterValue}`;
 
-    // Buat jendela cetak baru (Print Window)
-    const printWindow = window.open('', '_blank');
+    const printContainer = document.getElementById('print-pdf-area');
+    if (!printContainer) return;
 
-    // Susun isi HTML dokumen PDF yang rapi
+    // Susun baris data siswa yang difilter lengkap dengan rincian
     let tableRows = '';
     currentFilteredData.forEach((s, idx) => {
         tableRows += `
@@ -267,68 +266,42 @@ function cetakPDF() {
         `;
     });
 
-    const printContent = `
-        <!DOCTYPE html>
-        <html lang="id">
-        <head>
-            <meta charset="UTF-8">
-            <title>Laporan Data Siswa - ${judulFilter}</title>
-            <style>
-                @page { size: A4 landscape; margin: 15mm; }
-                body { font-family: Arial, sans-serif; font-size: 11pt; color: #1e293b; margin: 0; padding: 10px; }
-                .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2563eb; padding-bottom: 10px; }
-                .header h1 { margin: 0; font-size: 18pt; color: #2563eb; }
-                .header p { margin: 4px 0 0 0; font-size: 10pt; color: #64748b; }
-                .meta { margin-bottom: 15px; font-size: 10pt; font-weight: bold; }
-                table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                th, td { border: 1px solid #cbd5e1; padding: 7px 8px; font-size: 9.5pt; text-align: left; }
-                th { background-color: #f1f5f9; color: #1e293b; font-weight: bold; text-transform: uppercase; font-size: 8.5pt; }
-                tr:nth-child(even) { background-color: #f8fafc; }
-                .footer { margin-top: 20px; text-align: right; font-size: 9pt; color: #64748b; }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>MUHFIKRA APPS</h1>
-                <p>Laporan Resmi Data Rincian Siswa</p>
-            </div>
-            
-            <div class="meta">
-                Kategori Laporan : ${judulFilter} <br>
-                Total Data       : ${currentFilteredData.length} Siswa
-            </div>
+    // Masukkan HTML laporan ke dalam area khusus cetak
+    printContainer.innerHTML = `
+        <div class="pdf-header">
+            <h1>MUHFIKRA APPS</h1>
+            <p>Laporan Resmi Data Rincian Siswa</p>
+        </div>
+        
+        <div class="pdf-meta">
+            Kategori Laporan : <b>${judulFilter}</b> <br>
+            Total Data       : <b>${currentFilteredData.length} Siswa</b>
+        </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width:30px;">No</th>
-                        <th>Nama Lengkap</th>
-                        <th>NISN / NIS</th>
-                        <th style="width:60px;">Kelas</th>
-                        <th>NIK</th>
-                        <th>Nama Ibu</th>
-                        <th>Alamat Siswa</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                </tbody>
-            </table>
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th style="width:30px;">No</th>
+                    <th>Nama Lengkap</th>
+                    <th>NISN / NIS</th>
+                    <th style="width:50px;">Kelas</th>
+                    <th>NIK</th>
+                    <th>Nama Ibu</th>
+                    <th>Alamat Siswa</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${tableRows}
+            </tbody>
+        </table>
 
-            <div class="footer">
-                Dicetak otomatis via Muhfikra Apps pada ${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-            </div>
-
-            <script>
-                window.onload = function() {
-                    window.print();
-                    window.onafterprint = function() { window.close(); }
-                }
-            </script>
-        </body>
-        </html>
+        <div class="pdf-footer">
+            Dicetak otomatis via Muhfikra Apps pada ${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        </div>
     `;
 
-    printWindow.document.write(printContent);
-    printWindow.document.close();
+    // Panggil dialog cetak/simpan PDF bawaan HP/Browser
+    setTimeout(() => {
+        window.print();
+    }, 150);
 }
