@@ -13,7 +13,7 @@
 </head>
 <body>
 
-    <!-- Container Utama: Otomatis Fullscreen di HP/Tablet & Berbentuk HP di Desktop -->
+    <!-- Container Utama: Responsive Fullscreen di HP/Tablet & Berbentuk HP di Desktop -->
     <div class="device-container">
         <!-- Frame Notch HP Decorative (Hanya tampil saat dibuka di Laptop/Desktop) -->
         <div class="phone-notch"></div>
@@ -32,7 +32,7 @@
             <!-- Konten halaman akan dimuat oleh app.js -->
         </main>
 
-        <!-- Modal Detail Siswa (Hanya Read-Only) -->
+        <!-- Modal Detail Siswa (Read-Only) -->
         <div id="student-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <div class="modal-header">
@@ -49,7 +49,10 @@
         </div>
     </div>
 
-    <!-- JavaScript Aplikasi -->
+    <!-- Area Khusus Tersembunyi untuk Pencetakan PDF -->
+    <div id="print-pdf-area"></div>
+
+    <!-- JavaScript Utama -->
     <script src="js/app.js"></script>
 </body>
 </html>
