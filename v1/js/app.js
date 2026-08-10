@@ -130,7 +130,7 @@ function renderSiswaPage() {
             </select>
 
             <div class="action-buttons">
-                <!-- Revisi: Tombol Cetak PDF Berdasarkan Filter -->
+                <!-- Tombol Cetak PDF Berdasarkan Filter -->
                 <button class="btn btn-danger full-width" onclick="cetakPDF()">
                     <i class="fa-solid fa-file-pdf"></i> Cetak PDF
                 </button>
@@ -236,7 +236,7 @@ function closeStudentModal() {
 }
 
 /* ==========================================
-   5. REVISI FITUR: CETAK PDF RAPI LENGKAP
+   5. FITUR: CETAK PDF RAPI LENGKAP
    ========================================== */
 
 /**
