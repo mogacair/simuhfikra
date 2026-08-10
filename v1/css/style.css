@@ -18,26 +18,33 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* ==========================================
-   2. DEVICE CONTAINER (RESPONSIF HP, TABLET & DESKTOP)
-   ========================================== */
+/* Mencegah scroll di luar bingkai aplikasi HP */
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
 
-/* Latar belakang halaman */
 body {
-    background-color: #0f172a; /* Warna latar belakang luar mockup di Desktop */
+    background-color: #0f172a; /* Warna latar belakang luar mockup di Laptop/Desktop */
     color: var(--text-color);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    min-height: 100dvh; /* Dynamic Viewport Height presisi untuk HP */
     margin: 0;
     padding: 0;
 }
 
-/* Tampilan Utama: Fullscreen Responsif di HP & Tablet */
+/* ==========================================
+   2. DEVICE CONTAINER (RESPONSIF HP, TABLET & DESKTOP)
+   ========================================== */
+
+/* Tampilan Utama: Pas di Layar HP & Tablet tanpa Scroll Bawaan Browser */
 .device-container {
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     background-color: var(--bg-color);
     display: flex;
     flex-direction: column;
@@ -61,7 +68,7 @@ body {
 
     .device-container {
         width: 100%;
-        max-width: 430px; /* Ukuran lebar tampilan HP di Desktop */
+        max-width: 430px; /* Ukuran lebar HP di Desktop */
         height: 90vh;
         max-height: 880px;
         border-radius: 36px;
@@ -70,7 +77,7 @@ body {
     }
 
     .phone-notch {
-        display: block; /* Tampilkan Notch hanya di layar Laptop/Desktop */
+        display: block; /* Tampilkan Notch hanya di Desktop */
         width: 120px;
         height: 16px;
         background-color: #1e293b;
@@ -115,7 +122,7 @@ header h2 {
     border-radius: 50%;
 }
 
-/* Area Konten Utama */
+/* Area Konten Utama (Scroll internal hanya jika data panjang) */
 main#app-content {
     flex: 1;
     overflow-y: auto;
@@ -360,3 +367,94 @@ th {
 }
 
 .text-primary { color: var(--primary-color); }
+
+/* ==========================================
+   6. ATURAN CETAK PDF / PRINT (HP & DESKTOP)
+   ========================================== */
+
+/* Sembunyikan area cetak di tampilan aplikasi biasa */
+#print-pdf-area {
+    display: none;
+}
+
+/* Aturan Tampilan Saat Pemicu Cetak Berjalan */
+@media print {
+    body {
+        background-color: white !important;
+        overflow: visible !important;
+    }
+
+    /* Sembunyikan aplikasi HP saat pencetakan */
+    .device-container {
+        display: none !important;
+    }
+
+    /* Tampilkan HANYA kontainer laporan PDF */
+    #print-pdf-area {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        color: #1e293b;
+        font-family: Arial, sans-serif;
+        padding: 10px;
+    }
+
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+
+    .pdf-header {
+        text-align: center;
+        border-bottom: 2px solid #2563eb;
+        padding-bottom: 8px;
+        margin-bottom: 15px;
+    }
+
+    .pdf-header h1 {
+        margin: 0;
+        font-size: 18pt;
+        color: #2563eb;
+    }
+
+    .pdf-header p {
+        margin: 4px 0 0 0;
+        font-size: 10pt;
+        color: #64748b;
+    }
+
+    .pdf-meta {
+        margin-bottom: 12px;
+        font-size: 10pt;
+    }
+
+    .pdf-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+    }
+
+    .pdf-table th, .pdf-table td {
+        border: 1px solid #cbd5e1;
+        padding: 6px 8px;
+        font-size: 9pt;
+        text-align: left;
+    }
+
+    .pdf-table th {
+        background-color: #f1f5f9 !important;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 8pt;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .pdf-footer {
+        margin-top: 15px;
+        text-align: right;
+        font-size: 8.5pt;
+        color: #64748b;
+    }
+}
