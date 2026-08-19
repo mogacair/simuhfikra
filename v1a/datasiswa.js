@@ -1,6 +1,7 @@
 // GANTI URL DI BAWAH INI DENGAN URL DEPLOYMENT WEB APP GAS ANDA
 const GAS_URL_DATASIWA = "https://script.google.com/macros/s/AKfycbwN1NV5lFBmNfQP4mVu4c80-KQGneRYFtWegtYkmB0cT-hdLQQBLuHAcigEPFvJe9Kx/exec";
 
+
 let siswaData = [];
 let isDetailOpen = false;
 let isSiswaLoaded = false;
@@ -79,28 +80,62 @@ function renderTableSiswa() {
   });
 }
 
-// 4. Modal Detail Siswa (Bottom Sheet)
+// 4. Modal Detail Siswa (Grid 2 Kolom Compact Tanpa Scroll)
 function openDetailSiswa(nisn) {
   const s = siswaData.find(item => item.nisn === nisn);
   if (!s) return;
 
-  const items = [
-    { label: 'NIS / NIPD', val: s.nis },
-    { label: 'NISN', val: s.nisn },
-    { label: 'Nama Lengkap', val: s.nama, highlight: true },
-    { label: 'Kelas', val: s.kelas },
-    { label: 'Jenis Kelamin', val: s.jk },
-    { label: 'Tempat, Tanggal Lahir', val: s.ttl },
-    { label: 'Nama Ibu Kandung', val: s.ibu },
-    { label: 'Alamat Tinggal', val: s.alamat }
-  ];
+  const displayJK = (s.jk.toLowerCase() === 'laki-laki' || s.jk.toLowerCase() === 'l') ? 'Laki-laki' : 'Perempuan';
 
-  const html = items.map(item => `
-    <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 flex flex-col">
-      <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">${item.label}</span>
-      <span class="text-base sm:text-lg font-semibold ${item.highlight ? 'text-[#15803d] font-bold text-lg sm:text-xl' : 'text-[#374151]'} mt-0.5">${item.val}</span>
+  const html = `
+    <!-- Baris 1: Nama Lengkap (Full Width) -->
+    <div class="bg-green-50 p-2.5 rounded-xl border border-green-200">
+      <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">NAMA LENGKAP</span>
+      <span class="text-base sm:text-lg font-extrabold text-[#15803d] block leading-tight mt-0.5">${s.nama}</span>
     </div>
-  `).join('');
+
+    <!-- Baris 2: NIS/NIPD & NISN (2 Kolom) -->
+    <div class="grid grid-cols-2 gap-2">
+      <div class="bg-gray-50 p-2 rounded-xl border border-gray-200">
+        <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">NIS / NIPD</span>
+        <span class="text-sm sm:text-base font-bold text-[#374151] block mt-0.5 font-mono">${s.nis}</span>
+      </div>
+      <div class="bg-gray-50 p-2 rounded-xl border border-gray-200">
+        <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">NISN</span>
+        <span class="text-sm sm:text-base font-bold text-[#374151] block mt-0.5 font-mono">${s.nisn}</span>
+      </div>
+    </div>
+
+    <!-- Baris 3: Kelas & Jenis Kelamin (2 Kolom) -->
+    <div class="grid grid-cols-2 gap-2">
+      <div class="bg-gray-50 p-2 rounded-xl border border-gray-200">
+        <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">KELAS</span>
+        <span class="text-sm sm:text-base font-bold text-[#374151] block mt-0.5">${s.kelas}</span>
+      </div>
+      <div class="bg-gray-50 p-2 rounded-xl border border-gray-200">
+        <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">JENIS KELAMIN</span>
+        <span class="text-sm sm:text-base font-bold text-[#374151] block mt-0.5">${displayJK}</span>
+      </div>
+    </div>
+
+    <!-- Baris 4: TTL & Nama Ibu (2 Kolom) -->
+    <div class="grid grid-cols-2 gap-2">
+      <div class="bg-gray-50 p-2 rounded-xl border border-gray-200">
+        <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">TEMPAT, TGL LAHIR</span>
+        <span class="text-xs sm:text-sm font-semibold text-[#374151] block mt-0.5 leading-snug">${s.ttl}</span>
+      </div>
+      <div class="bg-gray-50 p-2 rounded-xl border border-gray-200">
+        <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">NAMA IBU KANDUNG</span>
+        <span class="text-xs sm:text-sm font-semibold text-[#374151] block mt-0.5 leading-snug">${s.ibu}</span>
+      </div>
+    </div>
+
+    <!-- Baris 5: Alamat Tinggal (Full Width) -->
+    <div class="bg-gray-50 p-2 rounded-xl border border-gray-200">
+      <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">ALAMAT TINGGAL</span>
+      <span class="text-xs sm:text-sm font-medium text-[#374151] block mt-0.5 leading-snug">${s.alamat}</span>
+    </div>
+  `;
 
   document.getElementById('detailBody').innerHTML = html;
   document.getElementById('detailBackdrop').classList.remove('hidden');
