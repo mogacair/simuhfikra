@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dapodik - SMK Muhammadiyah 5 Karanganyar</title>
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#15803d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Dapodik">
+  
+  <!-- Tailwind CSS & Libraries -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-brand-grayBg text-brand-grayDark font-sans text-lg select-none antialiased">
+
+  <!-- ================= CONTAINER UTAMA ================= -->
+  <div id="mainAppWrapper" class="max-w-2xl sm:max-w-4xl mx-auto min-h-screen flex flex-col p-4 sm:p-6 pb-20">
+
+    <!-- DASHBOARD / HOME -->
+    <main id="view-dashboard" class="flex-1 space-y-6">
+      <header class="text-center py-6 border-b-2 border-brand-green">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-brand-green tracking-tight">DAPODIK</h1>
+        <p class="text-lg text-gray-700 font-bold mt-1">SMK Muhammadiyah 5 Karanganyar</p>
+        <p class="text-base text-gray-500 font-medium">Tahun Pelajaran 2026/2027</p>
+      </header>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+        <!-- Menu Siswa -->
+        <button onclick="navigateTo('siswa')" class="p-6 bg-white border-l-8 border-brand-green rounded-2xl shadow-sm hover:shadow-md active:bg-gray-100 transition-all text-left flex items-center justify-between">
+          <div>
+            <span class="text-2xl font-bold text-brand-green block">Data Siswa</span>
+            <span class="text-base text-gray-500 font-normal mt-1 block">Database & Detail Profil</span>
+          </div>
+          <span class="text-4xl">👥</span>
+        </button>
+
+        <!-- Menu Guru -->
+        <button onclick="navigateTo('guru')" class="p-6 bg-white border-l-8 border-brand-yellow rounded-2xl shadow-sm hover:shadow-md active:bg-gray-100 transition-all text-left flex items-center justify-between">
+          <div>
+            <span class="text-2xl font-bold text-brand-yellow block">Data Guru</span>
+            <span class="text-base text-gray-500 font-normal mt-1 block">Pendidik & Staf</span>
+          </div>
+          <span class="text-4xl">👨‍🏫</span>
+        </button>
+
+        <!-- Menu Alumni -->
+        <button onclick="navigateTo('alumni')" class="p-6 bg-white border-l-8 border-brand-red rounded-2xl shadow-sm hover:shadow-md active:bg-gray-100 transition-all text-left flex items-center justify-between">
+          <div>
+            <span class="text-2xl font-bold text-brand-red block">Data Alumni</span>
+            <span class="text-base text-gray-500 font-normal mt-1 block">Penelusuran Tamatan</span>
+          </div>
+          <span class="text-4xl">🎓</span>
+        </button>
+
+        <!-- Menu Rapot -->
+        <button onclick="navigateTo('rapot')" class="p-6 bg-white border-l-8 border-brand-grayDark rounded-2xl shadow-sm hover:shadow-md active:bg-gray-100 transition-all text-left flex items-center justify-between">
+          <div>
+            <span class="text-2xl font-bold text-brand-grayDark block">Rapot</span>
+            <span class="text-base text-gray-500 font-normal mt-1 block">Cetak & Evaluasi Nilai</span>
+          </div>
+          <span class="text-4xl">📊</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- VIEW DATA SISWA -->
+    <main id="view-siswa" class="hidden flex-1 space-y-5">
+      <div class="flex items-center justify-between pb-3 border-b-2 border-gray-200">
+        <button onclick="goBack()" class="px-4 py-2 bg-brand-grayDark active:bg-black text-white font-bold rounded-xl text-base flex items-center gap-2">
+          ← Kembali
+        </button>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-brand-green">Data Siswa</h2>
+      </div>
+
+      <!-- Filter & Aksi -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200 space-y-4">
+        <div class="flex items-center justify-between">
+          <label for="filterKelasSiswa" class="block font-bold text-gray-700 text-base">Pilih Filter Kelas:</label>
+          <button onclick="fetchDataSiswa()" id="btnRefreshSiswa" class="text-sm font-bold text-brand-green hover:underline flex items-center gap-1">
+            🔄 Muat Ulang Data
+          </button>
+        </div>
+        
+        <select id="filterKelasSiswa" onchange="renderTableSiswa()" class="w-full p-3.5 bg-gray-50 border-2 border-gray-300 rounded-xl text-lg font-semibold focus:outline-none focus:border-brand-green">
+          <option value="ALL">Semua Kelas</option>
+          <option value="X TKR">X TKR</option>
+          <option value="X TKJ">X TKJ</option>
+          <option value="XI TKR">XI TKR</option>
+          <option value="XI TKJ">XI TKJ</option>
+          <option value="XII TKR">XII TKR</option>
+          <option value="XII TKJ">XII TKJ</option>
+        </select>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="exportExcelSiswa()" class="py-3.5 bg-brand-green hover:bg-brand-greenHover active:scale-98 text-white font-bold rounded-xl shadow text-base flex justify-center items-center gap-2">
+            📄 Unduh Excel
+          </button>
+          <button onclick="cetakPDFSiswa()" class="py-3.5 bg-brand-red active:scale-98 text-white font-bold rounded-xl shadow text-base flex justify-center items-center gap-2">
+            🖨️ Cetak PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabel Siswa -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-brand-green text-white text-base sm:text-lg font-bold">
+                <th class="p-3.5 text-center w-14">NO</th>
+                <th class="p-3.5 w-32">NISN</th>
+                <th class="p-3.5">NAMA (KLIK DETAIL)</th>
+                <th class="p-3.5 text-center w-28">KELAS</th>
+              </tr>
+            </thead>
+            <tbody id="siswaTableBody" class="divide-y divide-gray-200 text-base sm:text-lg font-medium">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- VIEW PLACEHOLDER LAINNYA -->
+    <main id="view-guru" class="hidden flex-1 space-y-5">
+      <button onclick="goBack()" class="px-4 py-2 bg-brand-grayDark text-white font-bold rounded-xl text-base">← Kembali</button>
+      <h2 class="text-2xl font-bold text-brand-yellow">Modul Data Guru</h2>
+      <p class="text-gray-500">Akan dikembangkan pada tahap selanjutnya.</p>
+    </main>
+
+    <main id="view-alumni" class="hidden flex-1 space-y-5">
+      <button onclick="goBack()" class="px-4 py-2 bg-brand-grayDark text-white font-bold rounded-xl text-base">← Kembali</button>
+      <h2 class="text-2xl font-bold text-brand-red">Modul Data Alumni</h2>
+      <p class="text-gray-500">Akan dikembangkan pada tahap selanjutnya.</p>
+    </main>
+
+    <main id="view-rapot" class="hidden flex-1 space-y-5">
+      <button onclick="goBack()" class="px-4 py-2 bg-brand-grayDark text-white font-bold rounded-xl text-base">← Kembali</button>
+      <h2 class="text-2xl font-bold text-brand-grayDark">Modul Rapot</h2>
+      <p class="text-gray-500">Akan dikembangkan pada tahap selanjutnya.</p>
+    </main>
+
+  </div>
+
+  <!-- ================= BOTTOM SHEET DETAIL SISWA ================= -->
+  <div id="detailBackdrop" onclick="closeDetailSiswa()" class="hidden fixed inset-0 bg-black/60 z-40 transition-opacity backdrop-blur-sm"></div>
+
+  <div id="detailDrawer" class="fixed inset-x-0 bottom-0 z-50 transform translate-y-full transition-transform duration-300 ease-out max-w-2xl sm:max-w-xl mx-auto">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl border-t-4 border-brand-yellow flex flex-col max-h-[85vh]">
+      <div class="p-4 pb-2 border-b border-gray-100 flex flex-col items-center relative">
+        <div class="w-12 h-1.5 bg-gray-300 rounded-full mb-3 sm:hidden"></div>
+        <div class="w-full flex justify-between items-center px-2">
+          <h3 class="text-xl sm:text-2xl font-black text-brand-grayDark">Profil Lengkap Siswa</h3>
+          <button onclick="closeDetailSiswa()" class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 font-bold active:bg-gray-200">&times;</button>
+        </div>
+      </div>
+
+      <div class="p-5 overflow-y-auto custom-scrollbar space-y-3.5 text-base sm:text-lg" id="detailBody">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="p-4 bg-gray-50 border-t border-gray-200">
+        <button onclick="closeDetailSiswa()" class="w-full py-3.5 bg-brand-grayDark text-white font-bold rounded-xl active:bg-black text-lg shadow">
+          Tutup Detail
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CONTAINER CETAK (A4 LANDSCAPE) ================= -->
+  <div id="printableArea"></div>
+
+  <!-- ================= MODULAR JAVASCRIPT LOADER ================= -->
+  <script src="app.js"></script>
+  <script src="datasiswa.js"></script>
+  <script src="dataguru.js"></script>
+  <script src="datanilai.js"></script>
+  <script src="datarapot.js"></script>
+</body>
+</html>
