@@ -1,5 +1,5 @@
 // GANTI URL DI BAWAH INI DENGAN URL DEPLOYMENT WEB APP GAS ANDA
-const GAS_URL_DATASIWA = "MASUKKAN_URL_EXEC_GOOGLE_APPS_SCRIPT_DISINI";
+const GAS_URL_DATASIWA = "https://script.google.com/macros/s/AKfycbwN1NV5lFBmNfQP4mVu4c80-KQGneRYFtWegtYkmB0cT-hdLQQBLuHAcigEPFvJe9Kx/exec";
 
 let siswaData = [];
 let isDetailOpen = false;
