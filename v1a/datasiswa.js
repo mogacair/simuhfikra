@@ -11,7 +11,7 @@ function initSiswaView() {
   }
 }
 
-// Mengambil Data dari GAS DB_datasiswa
+// 1. Mengambil Data dari Google Sheets via GAS
 async function fetchDataSiswa() {
   const tbody = document.getElementById('siswaTableBody');
   const btnRefresh = document.getElementById('btnRefreshSiswa');
@@ -28,7 +28,7 @@ async function fetchDataSiswa() {
       isSiswaLoaded = true;
       renderTableSiswa();
     } else {
-      throw new Error("Format respon tidak sesuai");
+      throw new Error("Format data tidak sesuai");
     }
   } catch (err) {
     console.error(err);
@@ -36,7 +36,7 @@ async function fetchDataSiswa() {
       <tr>
         <td colspan="4" class="p-6 text-center text-red-600 font-bold">
           Gagal mengambil data dari Google Sheet.<br>
-          <span class="text-sm font-normal text-gray-500">Pastikan URL GAS sudah benar dan hak akses diatur ke 'Anyone'.</span>
+          <span class="text-sm font-normal text-gray-500">Pastikan URL GAS sudah benar dan hak akses Web App diatur ke 'Anyone'.</span>
         </td>
       </tr>`;
   } finally {
@@ -44,14 +44,14 @@ async function fetchDataSiswa() {
   }
 }
 
-// Filter Data
+// 2. Filter Berdasarkan Pilihan Kelas
 function getFilteredDataSiswa() {
   const filter = document.getElementById('filterKelasSiswa').value;
   if (filter === 'ALL') return siswaData;
   return siswaData.filter(s => s.kelas.toUpperCase() === filter.toUpperCase());
 }
 
-// Render Tabel Siswa
+// 3. Render Tabel Siswa di Halaman
 function renderTableSiswa() {
   const tbody = document.getElementById('siswaTableBody');
   const data = getFilteredDataSiswa();
@@ -68,18 +68,18 @@ function renderTableSiswa() {
     row.innerHTML = `
       <td class="p-3.5 text-center font-bold text-gray-500">${index + 1}</td>
       <td class="p-3.5 font-mono text-gray-700 text-sm sm:text-base">${siswa.nisn}</td>
-      <td class="p-3.5 font-bold text-brand-green underline cursor-pointer" onclick="openDetailSiswa('${siswa.nisn}')">
+      <td class="p-3.5 font-bold text-[#15803d] underline cursor-pointer hover:text-[#166534]" onclick="openDetailSiswa('${siswa.nisn}')">
         ${siswa.nama}
       </td>
       <td class="p-3.5 text-center">
-        <span class="px-2 py-1 bg-gray-200 text-gray-800 rounded-md font-bold text-xs sm:text-sm">${siswa.kelas}</span>
+        <span class="px-2.5 py-1 bg-gray-200 text-gray-800 rounded-md font-bold text-xs sm:text-sm">${siswa.kelas}</span>
       </td>
     `;
     tbody.appendChild(row);
   });
 }
 
-// Detail Siswa (Bottom Sheet)
+// 4. Modal Detail Siswa (Bottom Sheet)
 function openDetailSiswa(nisn) {
   const s = siswaData.find(item => item.nisn === nisn);
   if (!s) return;
@@ -98,7 +98,7 @@ function openDetailSiswa(nisn) {
   const html = items.map(item => `
     <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 flex flex-col">
       <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">${item.label}</span>
-      <span class="text-base sm:text-lg font-semibold ${item.highlight ? 'text-brand-green font-bold text-lg sm:text-xl' : 'text-brand-grayDark'} mt-0.5">${item.val}</span>
+      <span class="text-base sm:text-lg font-semibold ${item.highlight ? 'text-[#15803d] font-bold text-lg sm:text-xl' : 'text-[#374151]'} mt-0.5">${item.val}</span>
     </div>
   `).join('');
 
@@ -120,7 +120,7 @@ function hideDetailDOM() {
   isDetailOpen = false;
 }
 
-// Export Excel
+// 5. Unduh Excel dengan Header & Rekap
 function exportExcelSiswa() {
   const filter = document.getElementById('filterKelasSiswa').value;
   const data = getFilteredDataSiswa();
@@ -144,12 +144,13 @@ function exportExcelSiswa() {
   worksheetData.push(["NO", "NIS/NIPD", "NISN", "NAMA SISWA", "JK", "TEMPAT, TGL LAHIR", "ALAMAT", "NAMA IBU", "KELAS"]);
 
   data.forEach((s, idx) => {
+    const displayJK = (s.jk.toLowerCase() === 'laki-laki' || s.jk.toLowerCase() === 'l') ? 'Laki-laki' : 'Perempuan';
     worksheetData.push([
       idx + 1,
       s.nis,
       s.nisn,
       s.nama,
-      s.jk,
+      displayJK,
       s.ttl,
       s.alamat,
       s.ibu,
@@ -168,7 +169,7 @@ function exportExcelSiswa() {
   XLSX.writeFile(wb, `Data_Siswa_${filter}_2026_2027.xlsx`);
 }
 
-// Cetak PDF
+// 6. Cetak PDF Langsung (A4 Landscape)
 function cetakPDFSiswa() {
   const filter = document.getElementById('filterKelasSiswa').value;
   const data = getFilteredDataSiswa();
