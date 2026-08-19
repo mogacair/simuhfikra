@@ -23,9 +23,15 @@ window.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('popstate', (e) => {
   const state = e.state;
   
-  // Jika modal detail sedang terbuka, tutup modal saja
+  // Tutup modal detail siswa jika sedang terbuka
   if (typeof isDetailOpen !== 'undefined' && isDetailOpen) {
     if (typeof hideDetailDOM === 'function') hideDetailDOM();
+    return;
+  }
+
+  // Tutup modal detail guru jika sedang terbuka
+  if (typeof isDetailGuruOpen !== 'undefined' && isDetailGuruOpen) {
+    if (typeof hideDetailGuruDOM === 'function') hideDetailGuruDOM();
     return;
   }
 
@@ -52,12 +58,13 @@ function showView(viewName) {
     if (el) el.classList.toggle('hidden', v !== viewName);
   });
 
-  if (typeof hideDetailDOM === 'function') {
-    hideDetailDOM();
-  }
+  if (typeof hideDetailDOM === 'function') hideDetailDOM();
+  if (typeof hideDetailGuruDOM === 'function') hideDetailGuruDOM();
 
-  // Auto trigger fetching saat membuka menu siswa pertama kali
+  // Trigger data saat navigasi
   if (viewName === 'siswa' && typeof initSiswaView === 'function') {
     initSiswaView();
+  } else if (viewName === 'guru' && typeof initGuruView === 'function') {
+    initGuruView();
   }
 }
