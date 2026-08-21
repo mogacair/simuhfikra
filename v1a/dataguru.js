@@ -4,6 +4,17 @@ let guruData = [];
 let isDetailGuruOpen = false;
 let isGuruLoaded = false;
 
+// Fungsi helper untuk mengambil tanggal lahir saja
+function getHanyaTglLahir(str) {
+  if (!str) return '-';
+  const val = String(str).trim();
+  if (val.includes(',')) {
+    const parts = val.split(',');
+    return parts.slice(1).join(',').trim() || val;
+  }
+  return val;
+}
+
 function initGuruView() {
   if (!isGuruLoaded) {
     fetchDataGuru();
@@ -43,7 +54,7 @@ async function fetchDataGuru() {
   }
 }
 
-// 2. Render Tabel Data Guru (Tanpa ID Guru)
+// 2. Render Tabel Data Guru
 function renderTableGuru() {
   const tbody = document.getElementById('guruTableBody');
   tbody.innerHTML = '';
@@ -70,12 +81,13 @@ function renderTableGuru() {
   });
 }
 
-// 3. Modal Detail Guru (Tanpa ID Guru, Mapel, & Capaian - Compact No Scroll)
+// 3. Modal Detail Guru (Diubah Menjadi TANGGAL LAHIR saja)
 function openDetailGuru(idGuru) {
   const g = guruData.find(item => item.idGuru === idGuru);
   if (!g) return;
 
   const displayJK = (g.jk.toLowerCase() === 'laki-laki' || g.jk.toLowerCase() === 'l') ? 'Laki-laki' : 'Perempuan';
+  const tglLahirOnly = getHanyaTglLahir(g.ttl);
 
   const html = `
     <!-- Baris 1: Nama Lengkap -->
@@ -84,7 +96,7 @@ function openDetailGuru(idGuru) {
       <span class="text-base sm:text-lg font-extrabold text-[#ca8a04] block leading-tight mt-0.5">${g.nama}</span>
     </div>
 
-    <!-- Baris 2: Jenis Kelamin & Nomor HP (2 Kolom) -->
+    <!-- Baris 2: Jenis Kelamin & Nomor HP -->
     <div class="grid grid-cols-2 gap-2">
       <div class="bg-gray-50 p-2 rounded-xl border border-gray-200">
         <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">JENIS KELAMIN</span>
@@ -96,10 +108,10 @@ function openDetailGuru(idGuru) {
       </div>
     </div>
 
-    <!-- Baris 3: Tempat, Tgl Lahir -->
+    <!-- Baris 3: Tanggal Lahir (Hanya Tanggal) -->
     <div class="bg-gray-50 p-2 rounded-xl border border-gray-200">
-      <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">TEMPAT, TGL LAHIR</span>
-      <span class="text-xs sm:text-sm font-semibold text-[#374151] block mt-0.5 leading-snug">${g.ttl || '-'}</span>
+      <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">TANGGAL LAHIR</span>
+      <span class="text-xs sm:text-sm font-semibold text-[#374151] block mt-0.5 leading-snug">${tglLahirOnly}</span>
     </div>
 
     <!-- Baris 4: Alamat Tinggal -->
@@ -139,7 +151,7 @@ function exportExcelGuru() {
     ["Tahun Pelajaran 2026/2027"],
     [`Laki-laki: ${jmlLaki} orang | Perempuan: ${jmlPerempuan} orang | Total: ${totalGuru} guru`],
     [],
-    ["NO", "NAMA GURU", "JK", "TEMPAT, TGL LAHIR", "ALAMAT", "NOMOR HP", "MAPEL DIAMPU"]
+    ["NO", "NAMA GURU", "JK", "TANGGAL LAHIR", "ALAMAT", "NOMOR HP", "MAPEL DIAMPU"]
   ];
 
   guruData.forEach((g, idx) => {
@@ -149,7 +161,7 @@ function exportExcelGuru() {
       idx + 1,
       g.nama,
       displayJK,
-      g.ttl,
+      getHanyaTglLahir(g.ttl),
       g.alamat,
       g.noHp,
       listMapelText
@@ -159,7 +171,7 @@ function exportExcelGuru() {
   const ws = XLSX.utils.aoa_to_sheet(worksheetData);
   ws['!cols'] = [
     { wch: 6 }, { wch: 28 }, { wch: 14 },
-    { wch: 26 }, { wch: 35 }, { wch: 18 }, { wch: 35 }
+    { wch: 20 }, { wch: 35 }, { wch: 18 }, { wch: 35 }
   ];
 
   const wb = XLSX.utils.book_new();
@@ -185,7 +197,7 @@ function cetakPDFGuru() {
         <td style="text-align: center;">${idx + 1}</td>
         <td style="font-weight: bold;">${g.nama}</td>
         <td style="text-align: center;">${displayJK}</td>
-        <td>${g.ttl}</td>
+        <td>${getHanyaTglLahir(g.ttl)}</td>
         <td>${g.alamat}</td>
         <td style="text-align: center; font-family: monospace;">${g.noHp}</td>
         <td>${listMapelText}</td>
@@ -213,8 +225,8 @@ function cetakPDFGuru() {
           <th style="width: 4%;">NO</th>
           <th style="width: 22%;">NAMA GURU</th>
           <th style="width: 4%;">JK</th>
-          <th style="width: 18%;">TEMPAT, TGL LAHIR</th>
-          <th style="width: 22%;">ALAMAT</th>
+          <th style="width: 16%;">TANGGAL LAHIR</th>
+          <th style="width: 24%;">ALAMAT</th>
           <th style="width: 12%;">NO HP</th>
           <th style="width: 18%;">MAPEL DIAMPU</th>
         </tr>
