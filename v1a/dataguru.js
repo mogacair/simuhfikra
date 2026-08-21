@@ -4,15 +4,25 @@ let guruData = [];
 let isDetailGuruOpen = false;
 let isGuruLoaded = false;
 
-// Fungsi helper untuk mengambil tanggal lahir saja
-function getHanyaTglLahir(str) {
-  if (!str) return '-';
-  const val = String(str).trim();
-  if (val.includes(',')) {
-    const parts = val.split(',');
-    return parts.slice(1).join(',').trim() || val;
+// Parser Tanggal Lahir (Membersihkan waktu, timezone, dan teks tempat lahir)
+function getHanyaTglLahir(val) {
+  if (!val) return '-';
+  
+  // Jika formatnya teks dengan koma, ambil bagian setelah koma (Contoh: "Karanganyar, 29 November 1981")
+  let cleanStr = String(val).trim();
+  if (cleanStr.includes(',')) {
+    const parts = cleanStr.split(',');
+    cleanStr = parts.slice(1).join(',').trim();
   }
-  return val;
+
+  // Coba parse jika string adalah format tanggal mentah JS / ISO / GMT
+  const parsedDate = new Date(cleanStr);
+  if (!isNaN(parsedDate.getTime())) {
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    return parsedDate.toLocaleDateString('id-ID', options);
+  }
+
+  return cleanStr;
 }
 
 function initGuruView() {
@@ -81,13 +91,13 @@ function renderTableGuru() {
   });
 }
 
-// 3. Modal Detail Guru (Diubah Menjadi TANGGAL LAHIR saja)
+// 3. Modal Detail Guru (Hanya Tanggal Lahir)
 function openDetailGuru(idGuru) {
   const g = guruData.find(item => item.idGuru === idGuru);
   if (!g) return;
 
   const displayJK = (g.jk.toLowerCase() === 'laki-laki' || g.jk.toLowerCase() === 'l') ? 'Laki-laki' : 'Perempuan';
-  const tglLahirOnly = getHanyaTglLahir(g.ttl);
+  const tglLahirBersih = getHanyaTglLahir(g.ttl);
 
   const html = `
     <!-- Baris 1: Nama Lengkap -->
@@ -108,10 +118,10 @@ function openDetailGuru(idGuru) {
       </div>
     </div>
 
-    <!-- Baris 3: Tanggal Lahir (Hanya Tanggal) -->
+    <!-- Baris 3: Tanggal Lahir Saja -->
     <div class="bg-gray-50 p-2 rounded-xl border border-gray-200">
       <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">TANGGAL LAHIR</span>
-      <span class="text-xs sm:text-sm font-semibold text-[#374151] block mt-0.5 leading-snug">${tglLahirOnly}</span>
+      <span class="text-xs sm:text-sm font-semibold text-[#374151] block mt-0.5 leading-snug">${tglLahirBersih}</span>
     </div>
 
     <!-- Baris 4: Alamat Tinggal -->
